@@ -30,6 +30,7 @@ export default function Visa() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedContinent, setSelectedContinent] = useState<string>('all');
   const [selectedVisaType, setSelectedVisaType] = useState<string>('all');
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
 
   useEffect(() => {
     const loadData = async () => {
@@ -65,7 +66,27 @@ export default function Visa() {
     const matchesVisaType = selectedVisaType === 'all' || 
                            visas.some(visa => visa.name.toLowerCase().includes(selectedVisaType.toLowerCase()));
     
-    return matchesSearch && matchesContinent && matchesVisaType && visas.length > 0;
+    // Special filter logic
+    const matchesSpecialFilter = selectedFilter === 'all' || (() => {
+      switch (selectedFilter) {
+        case 'popular':
+          return ['uae', 'singapore', 'thailand'].includes(country.id);
+        case 'visa-in-week':
+          return visas.some(visa => visa.processingTime.includes('7 days') || visa.processingTime.includes('3-5') || visa.processingTime.includes('5-7'));
+        case 'easy-visa':
+          return visas.some(visa => visa.requiredDocuments.length <= 3);
+        case 'season':
+          return country.continent === 'Asia' || country.continent === 'Europe';
+        case 'schengen':
+          return ['germany', 'france', 'italy', 'spain'].includes(country.id);
+        case 'visa-free':
+          return visas.some(visa => visa.fee === 0);
+        default:
+          return true;
+      }
+    })();
+    
+    return matchesSearch && matchesContinent && matchesVisaType && matchesSpecialFilter && visas.length > 0;
   });
 
   const continents = [...new Set(countries.map(c => c.continent))];
@@ -98,19 +119,77 @@ export default function Visa() {
         </p>
       </div>
 
-      {/* Filters */}
+      {/* Search Bar */}
+      <div className="bg-white rounded-xl shadow-soft p-6 mb-6">
+        <div className="relative max-w-2xl mx-auto">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Where to, captain?"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-12 text-lg"
+          />
+        </div>
+      </div>
+
+      {/* Filter Buttons */}
+      <div className="mb-8">
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Button
+            variant={selectedFilter === 'all' ? 'default' : 'outline'}
+            onClick={() => setSelectedFilter('all')}
+            className="rounded-full"
+          >
+            All
+          </Button>
+          <Button
+            variant={selectedFilter === 'popular' ? 'default' : 'outline'}
+            onClick={() => setSelectedFilter('popular')}
+            className="rounded-full"
+          >
+            Popular
+          </Button>
+          <Button
+            variant={selectedFilter === 'visa-in-week' ? 'default' : 'outline'}
+            onClick={() => setSelectedFilter('visa-in-week')}
+            className="rounded-full"
+          >
+            Visa in a week
+          </Button>
+          <Button
+            variant={selectedFilter === 'easy-visa' ? 'default' : 'outline'}
+            onClick={() => setSelectedFilter('easy-visa')}
+            className="rounded-full"
+          >
+            Easy Visa
+          </Button>
+          <Button
+            variant={selectedFilter === 'season' ? 'default' : 'outline'}
+            onClick={() => setSelectedFilter('season')}
+            className="rounded-full"
+          >
+            Season
+          </Button>
+          <Button
+            variant={selectedFilter === 'schengen' ? 'default' : 'outline'}
+            onClick={() => setSelectedFilter('schengen')}
+            className="rounded-full"
+          >
+            Schengen Visa
+          </Button>
+          <Button
+            variant={selectedFilter === 'visa-free' ? 'default' : 'outline'}
+            onClick={() => setSelectedFilter('visa-free')}
+            className="rounded-full"
+          >
+            Visa Free
+          </Button>
+        </div>
+      </div>
+
+      {/* Advanced Filters */}
       <div className="bg-white rounded-xl shadow-soft p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search countries..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Select value={selectedContinent} onValueChange={setSelectedContinent}>
             <SelectTrigger>
               <Globe className="w-4 h-4 mr-2" />
@@ -141,6 +220,7 @@ export default function Visa() {
             setSearchQuery('');
             setSelectedContinent('all');
             setSelectedVisaType('all');
+            setSelectedFilter('all');
           }}>
             Clear Filters
           </Button>
