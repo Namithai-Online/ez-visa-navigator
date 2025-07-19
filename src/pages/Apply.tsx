@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { MockAPI } from '@/lib/api';
+import { SMVKonveyorAPI } from '@/lib/smv-api';
 import { Country, VisaType, PersonalInfo, TravelDetails } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,11 +41,12 @@ export default function Apply() {
   const [country, setCountry] = useState<Country | null>(null);
   const [visaType, setVisaType] = useState<VisaType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [documentChecklist, setDocumentChecklist] = useState<any[]>([]);
   
   // Form data
   const [personalInfo, setPersonalInfo] = useState<Partial<PersonalInfo>>({});
   const [travelDetails, setTravelDetails] = useState<Partial<TravelDetails>>({});
-  const [uploadedDocuments, setUploadedDocuments] = useState<string[]>([]);
+  const [uploadedDocuments, setUploadedDocuments] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     const loadData = async () => {
@@ -53,12 +55,14 @@ export default function Apply() {
       
       if (visaId && countryId) {
         try {
-          const [visaData, countryData] = await Promise.all([
+          const [visaData, countryData, checklists] = await Promise.all([
             MockAPI.getVisaTypeById(visaId),
-            MockAPI.getCountryById(countryId)
+            MockAPI.getCountryById(countryId),
+            SMVKonveyorAPI.getDocumentChecklist(countryId, visaId)
           ]);
           setVisaType(visaData);
           setCountry(countryData);
+          setDocumentChecklist(checklists);
         } catch (error) {
           console.error('Error loading application data:', error);
         }
@@ -105,14 +109,14 @@ export default function Apply() {
     });
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (documentId: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      const fileNames = Array.from(files).map(file => file.name);
-      setUploadedDocuments(prev => [...prev, ...fileNames]);
+    if (files && files[0]) {
+      const fileName = files[0].name;
+      setUploadedDocuments(prev => ({...prev, [documentId]: fileName}));
       toast({
-        title: "Documents uploaded",
-        description: `${files.length} document(s) uploaded successfully.`,
+        title: "Document uploaded",
+        description: `${fileName} uploaded successfully.`,
       });
     }
   };
@@ -384,33 +388,120 @@ export default function Apply() {
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {visaType.requiredDocuments.map((doc, index) => (
-                    <div key={index} className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                      <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                      <h4 className="font-medium mb-2">{doc.charAt(0).toUpperCase() + doc.slice(1).replace('-', ' ')}</h4>
-                      <Input 
-                        type="file" 
-                        className="mb-2"
-                        onChange={handleFileUpload}
-                        accept=".pdf,.jpg,.jpeg,.png"
-                      />
-                      <p className="text-xs text-muted-foreground">PDF, JPG, PNG (Max 5MB)</p>
-                    </div>
-                  ))}
-                </div>
-                
-                {uploadedDocuments.length > 0 && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h4 className="font-medium text-green-800 mb-2">Uploaded Documents:</h4>
-                    <ul className="space-y-1">
-                      {uploadedDocuments.map((doc, index) => (
-                        <li key={index} className="text-sm text-green-700 flex items-center">
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          {doc}
-                        </li>
-                      ))}
-                    </ul>
+                {documentChecklist.length > 0 ? (
+                  <div className="space-y-6">
+                    {documentChecklist.map((checklist, checklistIndex) => (
+                      <div key={checklistIndex}>
+                        {checklist.categories.map((category: any, categoryIndex: number) => (
+                          <div key={categoryIndex} className="mb-8">
+                            <div className="flex items-center mb-4">
+                              <span className="text-2xl mr-3">{category.icon}</span>
+                              <h4 className="text-lg font-semibold">{category.name}</h4>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {category.documents.map((doc: any, docIndex: number) => {
+                                const docKey = `${category.id}-${doc.id}`;
+                                const isUploaded = uploadedDocuments[docKey];
+                                
+                                return (
+                                  <div 
+                                    key={docIndex} 
+                                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                                      isUploaded 
+                                        ? 'border-green-300 bg-green-50' 
+                                        : doc.required 
+                                          ? 'border-red-300 bg-red-50' 
+                                          : 'border-gray-300 bg-gray-50'
+                                    }`}
+                                  >
+                                    <div className="flex justify-between items-start mb-2">
+                                      <h5 className="font-medium text-left flex-1">{doc.name}</h5>
+                                      {doc.required && !isUploaded && (
+                                        <Badge variant="destructive" className="ml-2">Required</Badge>
+                                      )}
+                                      {isUploaded && (
+                                        <CheckCircle className="w-5 h-5 text-green-600 ml-2" />
+                                      )}
+                                    </div>
+                                    
+                                    {doc.description && (
+                                      <p className="text-xs text-muted-foreground text-left mb-3">{doc.description}</p>
+                                    )}
+                                    
+                                    <div className="space-y-2">
+                                      <Input 
+                                        type="file" 
+                                        onChange={handleFileUpload(docKey)}
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        className="text-sm"
+                                      />
+                                      <p className="text-xs text-muted-foreground">PDF, JPG, PNG (Max 5MB)</p>
+                                      
+                                      {doc.sampleUrl && (
+                                        <Button variant="link" size="sm" className="text-xs">
+                                          View Sample
+                                        </Button>
+                                      )}
+                                    </div>
+                                    
+                                    {isUploaded && (
+                                      <p className="text-xs text-green-600 mt-2 font-medium">
+                                        ✓ {isUploaded}
+                                      </p>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                    
+                    {/* Upload Summary */}
+                    {Object.keys(uploadedDocuments).length > 0 && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 className="font-medium text-blue-800 mb-2">Upload Summary</h4>
+                        <div className="text-sm text-blue-700">
+                          <p>{Object.keys(uploadedDocuments).length} document(s) uploaded</p>
+                          {documentChecklist[0] && (
+                            <p className="mt-1">
+                              Required documents: {
+                                documentChecklist[0].categories.reduce((acc: number, cat: any) => 
+                                  acc + cat.documents.filter((doc: any) => doc.required).length, 0
+                                )
+                              } | 
+                              Uploaded required: {
+                                Object.keys(uploadedDocuments).filter(key => {
+                                  const [catId, docId] = key.split('-');
+                                  return documentChecklist[0].categories
+                                    .find((cat: any) => cat.id === catId)?.documents
+                                    .find((doc: any) => doc.id === docId)?.required;
+                                }).length
+                              }
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // Fallback to basic document list if checklist not available
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {visaType.requiredDocuments.map((doc, index) => (
+                      <div key={index} className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                        <h4 className="font-medium mb-2">{doc.charAt(0).toUpperCase() + doc.slice(1).replace('-', ' ')}</h4>
+                        <Input 
+                          type="file" 
+                          className="mb-2"
+                          onChange={handleFileUpload(doc)}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                        />
+                        <p className="text-xs text-muted-foreground">PDF, JPG, PNG (Max 5MB)</p>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
