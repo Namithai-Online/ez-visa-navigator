@@ -34,6 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import { AddItineraryForm } from '@/components/AddItineraryForm';
 import { OrdersTable } from '@/components/OrdersTable';
+import { DocumentsPricing } from '@/components/DocumentsPricing';
 
 // Dummy admin data
 const DUMMY_ADMIN_APPLICATIONS = [
@@ -371,6 +372,8 @@ export default function AdminDashboard() {
         return <OrdersTable />;
       case 'add-itinerary':
         return <AddItineraryForm />;
+      case 'documents':
+        return <DocumentsPricing />;
       default:
         return renderDashboardContent();
     }
@@ -401,6 +404,7 @@ export default function AdminDashboard() {
                   <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                   <TabsTrigger value="orders">Orders</TabsTrigger>
                   <TabsTrigger value="add-itinerary">Add Itinerary</TabsTrigger>
+                  <TabsTrigger value="documents">Documents & Pricing</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
