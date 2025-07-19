@@ -213,9 +213,11 @@ export default function UserDashboard() {
                           </Button>
                         </Link>
                       ) : (
-                        <Button variant="outline" size="sm">
-                          View Details
-                        </Button>
+                        <Link to={`/application/${application.id}`}>
+                          <Button variant="outline" size="sm">
+                            View Details
+                          </Button>
+                        </Link>
                       )}
                     </div>
                   </div>
