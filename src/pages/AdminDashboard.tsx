@@ -382,7 +382,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background flex w-full">
       {/* Sidebar */}
-      <AdminSidebar collapsed={sidebarCollapsed} />
+      <AdminSidebar collapsed={sidebarCollapsed} onTabChange={setActiveTab} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">

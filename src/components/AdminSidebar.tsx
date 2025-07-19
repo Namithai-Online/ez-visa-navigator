@@ -17,7 +17,16 @@ import {
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
-const menuItems = [
+interface MenuItem {
+  title: string;
+  icon: any;
+  path: string;
+  exact?: boolean;
+  badge?: string;
+  tabValue?: string;
+}
+
+const menuItems: MenuItem[] = [
   { 
     title: 'Home', 
     icon: Home, 
@@ -32,7 +41,8 @@ const menuItems = [
   { 
     title: 'Documents & Pricing', 
     icon: File, 
-    path: '/admin/documents' 
+    path: '/admin',
+    tabValue: 'documents'
   },
   { 
     title: 'Users', 
@@ -79,9 +89,10 @@ const menuItems = [
 
 interface AdminSidebarProps {
   collapsed: boolean;
+  onTabChange?: (tab: string) => void;
 }
 
-export function AdminSidebar({ collapsed }: AdminSidebarProps) {
+export function AdminSidebar({ collapsed, onTabChange }: AdminSidebarProps) {
   const location = useLocation();
 
   const isActive = (path: string, exact = false) => {
@@ -131,29 +142,54 @@ export function AdminSidebar({ collapsed }: AdminSidebarProps) {
             const active = isActive(item.path, item.exact);
             
             return (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    active 
-                      ? "bg-primary/10 text-primary" 
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                    collapsed && "justify-center"
-                  )}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {!collapsed && (
-                    <>
-                      <span className="flex-1">{item.title}</span>
-                      {item.badge && (
-                        <Badge variant="secondary" className="text-xs">
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </>
-                  )}
-                </NavLink>
+              <li key={item.path + (item.tabValue || '')}>
+                {item.tabValue ? (
+                  <button
+                    onClick={() => onTabChange?.(item.tabValue!)}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
+                      active 
+                        ? "bg-primary/10 text-primary" 
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      collapsed && "justify-center"
+                    )}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1">{item.title}</span>
+                        {item.badge && (
+                          <Badge variant="secondary" className="text-xs">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                      active 
+                        ? "bg-primary/10 text-primary" 
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      collapsed && "justify-center"
+                    )}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1">{item.title}</span>
+                        {item.badge && (
+                          <Badge variant="secondary" className="text-xs">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                )}
               </li>
             );
           })}
