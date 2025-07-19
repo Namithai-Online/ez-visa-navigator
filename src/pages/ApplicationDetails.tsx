@@ -347,7 +347,7 @@ export default function ApplicationDetails() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Quick Info Card */}
-          <Card className="sticky top-24">
+          <Card className="sticky top-24 z-10 bg-background border shadow-md">
             <CardHeader>
               <CardTitle>Application Summary</CardTitle>
             </CardHeader>
