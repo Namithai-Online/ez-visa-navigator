@@ -1,0 +1,90 @@
+[
+  {
+    "id": "uae",
+    "name": "United Arab Emirates",
+    "code": "AE",
+    "continent": "Asia",
+    "visaTypes": ["tourist", "business", "transit"],
+    "flagUrl": "https://flagcdn.com/w160/ae.png",
+    "description": "Experience luxury and innovation in the heart of the Middle East",
+    "capital": "Abu Dhabi",
+    "currency": "AED"
+  },
+  {
+    "id": "singapore",
+    "name": "Singapore",
+    "code": "SG", 
+    "continent": "Asia",
+    "visaTypes": ["tourist", "business"],
+    "flagUrl": "https://flagcdn.com/w160/sg.png",
+    "description": "Discover the Lion City's perfect blend of cultures and modernity",
+    "capital": "Singapore",
+    "currency": "SGD"
+  },
+  {
+    "id": "thailand",
+    "name": "Thailand",
+    "code": "TH",
+    "continent": "Asia", 
+    "visaTypes": ["tourist", "business", "education"],
+    "flagUrl": "https://flagcdn.com/w160/th.png",
+    "description": "Land of smiles with beautiful beaches and rich culture",
+    "capital": "Bangkok",
+    "currency": "THB"
+  },
+  {
+    "id": "india",
+    "name": "India",
+    "code": "IN",
+    "continent": "Asia",
+    "visaTypes": ["tourist", "business", "medical"],
+    "flagUrl": "https://flagcdn.com/w160/in.png",
+    "description": "Incredible India with diverse landscapes and heritage",
+    "capital": "New Delhi", 
+    "currency": "INR"
+  },
+  {
+    "id": "turkey",
+    "name": "Turkey",
+    "code": "TR",
+    "continent": "Europe",
+    "visaTypes": ["tourist", "business"],
+    "flagUrl": "https://flagcdn.com/w160/tr.png",
+    "description": "Bridge between Europe and Asia with stunning history",
+    "capital": "Ankara",
+    "currency": "TRY"
+  },
+  {
+    "id": "egypt",
+    "name": "Egypt",
+    "code": "EG",
+    "continent": "Africa",
+    "visaTypes": ["tourist", "business"],
+    "flagUrl": "https://flagcdn.com/w160/eg.png",
+    "description": "Home to ancient pyramids and timeless wonders",
+    "capital": "Cairo",
+    "currency": "EGP"
+  },
+  {
+    "id": "vietnam",
+    "name": "Vietnam",
+    "code": "VN",
+    "continent": "Asia",
+    "visaTypes": ["tourist", "business"],
+    "flagUrl": "https://flagcdn.com/w160/vn.png",
+    "description": "Beautiful landscapes from mountains to pristine beaches",
+    "capital": "Hanoi",
+    "currency": "VND"
+  },
+  {
+    "id": "malaysia",
+    "name": "Malaysia",
+    "code": "MY",
+    "continent": "Asia",
+    "visaTypes": ["tourist", "business"],
+    "flagUrl": "https://flagcdn.com/w160/my.png",
+    "description": "Truly Asia - where cultures and cuisines blend perfectly",
+    "capital": "Kuala Lumpur",
+    "currency": "MYR"
+  }
+]

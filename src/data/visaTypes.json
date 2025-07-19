@@ -1,0 +1,90 @@
+[
+  {
+    "id": "tourist",
+    "name": "Tourist Visa",
+    "description": "Perfect for leisure travel, sightseeing, and visiting friends and family",
+    "fee": 65,
+    "processingTime": "5-7 business days",
+    "validity": "30 days",
+    "maxStay": "30 days",
+    "requiredDocuments": ["passport", "photo", "bank-statement", "itinerary"],
+    "countryId": "uae"
+  },
+  {
+    "id": "business",
+    "name": "Business Visa", 
+    "description": "For business meetings, conferences, and commercial activities",
+    "fee": 120,
+    "processingTime": "3-5 business days",
+    "validity": "90 days",
+    "maxStay": "30 days",
+    "requiredDocuments": ["passport", "photo", "invitation-letter", "company-letter"],
+    "countryId": "uae"
+  },
+  {
+    "id": "transit",
+    "name": "Transit Visa",
+    "description": "For passengers transiting through UAE airports",
+    "fee": 25,
+    "processingTime": "1-2 business days", 
+    "validity": "96 hours",
+    "maxStay": "96 hours",
+    "requiredDocuments": ["passport", "ticket"],
+    "countryId": "uae"
+  },
+  {
+    "id": "sg-tourist",
+    "name": "Singapore Tourist Visa",
+    "description": "Explore the Garden City with friends and family",
+    "fee": 85,
+    "processingTime": "4-6 business days",
+    "validity": "30 days", 
+    "maxStay": "30 days",
+    "requiredDocuments": ["passport", "photo", "bank-statement", "itinerary"],
+    "countryId": "singapore"
+  },
+  {
+    "id": "sg-business",
+    "name": "Singapore Business Visa",
+    "description": "For business meetings and commercial purposes",
+    "fee": 150,
+    "processingTime": "3-4 business days",
+    "validity": "90 days",
+    "maxStay": "30 days", 
+    "requiredDocuments": ["passport", "photo", "invitation-letter", "company-letter"],
+    "countryId": "singapore"
+  },
+  {
+    "id": "th-tourist",
+    "name": "Thailand Tourist Visa",
+    "description": "Enjoy beautiful beaches and rich culture",
+    "fee": 40,
+    "processingTime": "5-7 business days",
+    "validity": "60 days",
+    "maxStay": "30 days",
+    "requiredDocuments": ["passport", "photo", "bank-statement", "itinerary"],
+    "countryId": "thailand"
+  },
+  {
+    "id": "in-tourist",
+    "name": "India Tourist Visa",
+    "description": "Discover incredible India's heritage and landscapes",
+    "fee": 55,
+    "processingTime": "7-10 business days",
+    "validity": "90 days",
+    "maxStay": "30 days",
+    "requiredDocuments": ["passport", "photo", "bank-statement"],
+    "countryId": "india"
+  },
+  {
+    "id": "tr-tourist", 
+    "name": "Turkey Tourist Visa",
+    "description": "Explore the bridge between Europe and Asia",
+    "fee": 75,
+    "processingTime": "3-5 business days",
+    "validity": "90 days",
+    "maxStay": "30 days",
+    "requiredDocuments": ["passport", "photo", "hotel-booking"],
+    "countryId": "turkey"
+  }
+]

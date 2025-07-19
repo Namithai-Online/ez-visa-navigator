@@ -1,0 +1,163 @@
+[
+  {
+    "id": "app_001",
+    "userId": "user_001",
+    "countryId": "uae", 
+    "visaTypeId": "tourist",
+    "status": "approved",
+    "personalInfo": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "dateOfBirth": "1990-05-15",
+      "nationality": "American",
+      "passportNumber": "US123456789",
+      "passportExpiry": "2028-05-15",
+      "gender": "male",
+      "maritalStatus": "single",
+      "occupation": "Software Engineer",
+      "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10001",
+        "country": "United States"
+      }
+    },
+    "travelDetails": {
+      "purposeOfVisit": "Tourism",
+      "arrivalDate": "2024-08-15",
+      "departureDate": "2024-08-30",
+      "duration": 15,
+      "accommodation": "Hotel Grand Plaza, Dubai",
+      "previousVisits": false,
+      "emergencyContact": {
+        "name": "Jane Doe",
+        "relationship": "Sister",
+        "phone": "+1234567891",
+        "email": "jane.doe@example.com"
+      }
+    },
+    "documents": [
+      {
+        "id": "doc_001",
+        "type": "passport",
+        "name": "passport_scan.pdf",
+        "url": "/documents/passport_scan.pdf",
+        "uploadedAt": "2024-07-15T10:00:00Z",
+        "status": "verified"
+      },
+      {
+        "id": "doc_002",
+        "type": "photo",
+        "name": "passport_photo.jpg",
+        "url": "/documents/passport_photo.jpg",
+        "uploadedAt": "2024-07-15T10:05:00Z",
+        "status": "verified"
+      }
+    ],
+    "createdAt": "2024-07-15T09:00:00Z",
+    "updatedAt": "2024-07-20T14:30:00Z",
+    "submittedAt": "2024-07-15T11:00:00Z",
+    "reviewedAt": "2024-07-20T14:30:00Z"
+  },
+  {
+    "id": "app_002", 
+    "userId": "user_001",
+    "countryId": "singapore",
+    "visaTypeId": "sg-business",
+    "status": "in-review",
+    "personalInfo": {
+      "firstName": "John",
+      "lastName": "Doe", 
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "dateOfBirth": "1990-05-15",
+      "nationality": "American",
+      "passportNumber": "US123456789",
+      "passportExpiry": "2028-05-15",
+      "gender": "male",
+      "maritalStatus": "single",
+      "occupation": "Software Engineer",
+      "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10001",
+        "country": "United States"
+      }
+    },
+    "travelDetails": {
+      "purposeOfVisit": "Business Meeting",
+      "arrivalDate": "2024-09-10",
+      "departureDate": "2024-09-15",
+      "duration": 5,
+      "accommodation": "Marina Bay Sands, Singapore",
+      "previousVisits": false,
+      "emergencyContact": {
+        "name": "Jane Doe",
+        "relationship": "Sister",
+        "phone": "+1234567891",
+        "email": "jane.doe@example.com"
+      }
+    },
+    "documents": [
+      {
+        "id": "doc_003",
+        "type": "passport",
+        "name": "passport_scan.pdf",
+        "url": "/documents/passport_scan.pdf",
+        "uploadedAt": "2024-07-25T10:00:00Z",
+        "status": "verified"
+      }
+    ],
+    "createdAt": "2024-07-25T09:00:00Z",
+    "updatedAt": "2024-07-25T11:00:00Z",
+    "submittedAt": "2024-07-25T11:00:00Z"
+  },
+  {
+    "id": "app_003",
+    "userId": "user_001", 
+    "countryId": "thailand",
+    "visaTypeId": "th-tourist",
+    "status": "draft",
+    "personalInfo": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "dateOfBirth": "1990-05-15",
+      "nationality": "American",
+      "passportNumber": "US123456789",
+      "passportExpiry": "2028-05-15",
+      "gender": "male",
+      "maritalStatus": "single",
+      "occupation": "Software Engineer",
+      "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10001",
+        "country": "United States"
+      }
+    },
+    "travelDetails": {
+      "purposeOfVisit": "Tourism",
+      "arrivalDate": "2024-10-01",
+      "departureDate": "2024-10-15",
+      "duration": 14,
+      "accommodation": "To be decided",
+      "previousVisits": false,
+      "emergencyContact": {
+        "name": "Jane Doe",
+        "relationship": "Sister",
+        "phone": "+1234567891",
+        "email": "jane.doe@example.com"
+      }
+    },
+    "documents": [],
+    "createdAt": "2024-07-28T09:00:00Z",
+    "updatedAt": "2024-07-28T09:00:00Z"
+  }
+]
