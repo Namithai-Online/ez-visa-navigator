@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MockAPI } from '@/lib/api';
+import { SMVKonveyorAPI } from '@/lib/smv-api';
 import { Country, VisaType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import DocumentChecklist from '@/components/DocumentChecklist';
 import { 
   Clock, 
   DollarSign, 
@@ -24,6 +27,7 @@ export default function VisaDetails() {
   const [visaType, setVisaType] = useState<VisaType | null>(null);
   const [country, setCountry] = useState<Country | null>(null);
   const [loading, setLoading] = useState(true);
+  const [allVisaTypes, setAllVisaTypes] = useState<VisaType[]>([]);
 
   useEffect(() => {
     const loadVisaDetails = async () => {
@@ -33,8 +37,12 @@ export default function VisaDetails() {
         const visa = await MockAPI.getVisaTypeById(id);
         if (visa) {
           setVisaType(visa);
-          const countryData = await MockAPI.getCountryById(visa.countryId);
+          const [countryData, allVisas] = await Promise.all([
+            MockAPI.getCountryById(visa.countryId),
+            MockAPI.getVisaTypesByCountry(visa.countryId)
+          ]);
           setCountry(countryData);
+          setAllVisaTypes(allVisas);
         }
       } catch (error) {
         console.error('Error loading visa details:', error);
@@ -98,93 +106,116 @@ export default function VisaDetails() {
         </Link>
       </Button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Header */}
-          <div className="flex items-start space-x-4">
-            <img 
-              src={country.flagUrl} 
-              alt={`${country.name} flag`}
-              className="w-16 h-12 rounded object-cover"
-            />
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold">{visaType.name}</h1>
-              <p className="text-xl text-muted-foreground">{country.name}</p>
-              <p className="text-muted-foreground mt-2">{visaType.description}</p>
+      <Tabs defaultValue="overview" className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="overview">Visa Overview</TabsTrigger>
+            <TabsTrigger value="documents">Document Checklist</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Header */}
+            <div className="flex items-start space-x-4">
+              <img 
+                src={country.flagUrl} 
+                alt={`${country.name} flag`}
+                className="w-16 h-12 rounded object-cover"
+              />
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold">{visaType.name}</h1>
+                <p className="text-xl text-muted-foreground">{country.name}</p>
+                <p className="text-muted-foreground mt-2">{visaType.description}</p>
+              </div>
             </div>
-          </div>
 
-          {/* Visa Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Visa Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center space-x-3">
-                  <DollarSign className="w-5 h-5 text-travel-blue" />
-                  <div>
-                    <p className="font-medium">Visa Fee</p>
-                    <p className="text-2xl font-bold text-travel-blue">${visaType.fee}</p>
+            {/* Visa Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Visa Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-center space-x-3">
+                    <DollarSign className="w-5 h-5 text-travel-blue" />
+                    <div>
+                      <p className="font-medium">Visa Fee</p>
+                      <p className="text-2xl font-bold text-travel-blue">${visaType.fee}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Clock className="w-5 h-5 text-travel-teal" />
+                    <div>
+                      <p className="font-medium">Processing Time</p>
+                      <p className="text-lg">{visaType.processingTime}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="w-5 h-5 text-travel-sky" />
+                    <div>
+                      <p className="font-medium">Validity Period</p>
+                      <p className="text-lg">{visaType.validity}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Globe className="w-5 h-5 text-travel-gold" />
+                    <div>
+                      <p className="font-medium">Maximum Stay</p>
+                      <p className="text-lg">{visaType.maxStay}</p>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-3">
-                  <Clock className="w-5 h-5 text-travel-teal" />
-                  <div>
-                    <p className="font-medium">Processing Time</p>
-                    <p className="text-lg">{visaType.processingTime}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <Calendar className="w-5 h-5 text-travel-sky" />
-                  <div>
-                    <p className="font-medium">Validity Period</p>
-                    <p className="text-lg">{visaType.validity}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <Globe className="w-5 h-5 text-travel-gold" />
-                  <div>
-                    <p className="font-medium">Maximum Stay</p>
-                    <p className="text-lg">{visaType.maxStay}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Required Documents */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Required Documents</CardTitle>
-              <CardDescription>
-                Please prepare the following documents before starting your application
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {visaType.requiredDocuments.map((doc, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-success" />
-                    <span>{documentTypes[doc as keyof typeof documentTypes] || doc}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            {/* Required Documents Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Required Documents Summary</CardTitle>
+                <CardDescription>
+                  Quick overview of essential documents. View detailed checklist in the Documents tab.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {visaType.requiredDocuments.slice(0, 5).map((doc, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <CheckCircle className="w-5 h-5 text-success" />
+                      <span>{documentTypes[doc as keyof typeof documentTypes] || doc}</span>
+                    </div>
+                  ))}
+                  {visaType.requiredDocuments.length > 5 && (
+                    <p className="text-sm text-muted-foreground ml-8">
+                      +{visaType.requiredDocuments.length - 5} more documents. See full checklist in Documents tab.
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Important Information */}
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              Processing times may vary depending on your nationality and current application volume. 
-              We recommend applying at least 2 weeks before your intended travel date.
-            </AlertDescription>
-          </Alert>
+            {/* Important Information */}
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Processing times may vary depending on your nationality and current application volume. 
+                We recommend applying at least 2 weeks before your intended travel date.
+              </AlertDescription>
+            </Alert>
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <DocumentChecklist
+              countryName={country.name}
+              countryFlag={country.flagUrl}
+              visaTypes={allVisaTypes.map(vt => ({
+                id: vt.id,
+                name: vt.name,
+                type: vt.name.toLowerCase().includes('tourist') ? 'tourist' : 'business'
+              }))}
+            />
+          </TabsContent>
         </div>
 
         {/* Sidebar */}
@@ -268,7 +299,7 @@ export default function VisaDetails() {
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start">
                 <FileText className="w-4 h-4 mr-2" />
-                Document Checklist
+                View Document Samples
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <Info className="w-4 h-4 mr-2" />
@@ -281,7 +312,7 @@ export default function VisaDetails() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </Tabs>
     </div>
   );
 }
