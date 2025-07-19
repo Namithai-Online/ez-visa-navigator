@@ -7,6 +7,8 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   FileText, 
   Clock, 
@@ -15,9 +17,23 @@ import {
   Search, 
   Filter,
   Users,
-  TrendingUp
+  TrendingUp,
+  Plus,
+  Menu,
+  Globe,
+  CreditCard,
+  Package,
+  Shield,
+  Calendar,
+  Settings,
+  BarChart3,
+  DollarSign,
+  Activity
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { AdminSidebar } from '@/components/AdminSidebar';
+import { AddItineraryForm } from '@/components/AddItineraryForm';
+import { OrdersTable } from '@/components/OrdersTable';
 
 // Dummy admin data
 const DUMMY_ADMIN_APPLICATIONS = [
@@ -106,6 +122,9 @@ export default function AdminDashboard() {
   const [applications, setApplications] = useState(DUMMY_ADMIN_APPLICATIONS);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showAddItinerary, setShowAddItinerary] = useState(false);
 
   const handleStatusChange = (applicationId: string, newStatus: string) => {
     setApplications(prev => 
@@ -137,201 +156,282 @@ export default function AdminDashboard() {
     rejected: applications.filter(app => app.status === 'rejected').length
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto p-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage visa applications and user requests</p>
+  const dashboardStats = [
+    {
+      title: "Total Orders",
+      value: "₹0.00",
+      subtitle: "Wallet Balance",
+      icon: DollarSign,
+      className: "bg-green-50 text-green-600"
+    },
+    {
+      title: "SMV Wise",
+      value: "₹0.00",
+      subtitle: "SMV Wise",
+      icon: CreditCard,
+      className: "bg-blue-50 text-blue-600"
+    },
+    {
+      title: "Add Money",
+      value: "All transactions",
+      subtitle: "",
+      icon: Plus,
+      className: "bg-purple-50 text-purple-600"
+    }
+  ];
+
+  const renderDashboardContent = () => (
+    <div className="space-y-6">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Hello, NAMTHAI TRAVELS!</h1>
+          <p className="text-muted-foreground">Place your next Visa order</p>
+          <p className="text-sm text-muted-foreground">We've got you covered for all countries</p>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold">₹0.00</div>
+          <div className="text-muted-foreground">Wallet Balance</div>
+          <div className="flex gap-2 mt-2">
+            <Button size="sm" variant="outline">Add Money</Button>
+            <Button size="sm" variant="outline">All transactions</Button>
           </div>
-          <Button variant="outline" onClick={logout}>
-            Logout
-          </Button>
         </div>
+      </div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-blue-100 rounded-full">
-                  <Users className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                </div>
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Globe className="w-6 h-6 text-blue-600" />
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-orange-100 rounded-full">
-                  <FileText className="h-4 w-4 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Submitted</p>
-                  <p className="text-2xl font-bold">{stats.submitted}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-yellow-100 rounded-full">
-                  <Clock className="h-4 w-4 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">In Review</p>
-                  <p className="text-2xl font-bold">{stats.inReview}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-green-100 rounded-full">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Approved</p>
-                  <p className="text-2xl font-bold">{stats.approved}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-red-100 rounded-full">
-                  <XCircle className="h-4 w-4 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Rejected</p>
-                  <p className="text-2xl font-bold">{stats.rejected}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters and Search */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Application Management</CardTitle>
-            <CardDescription>Review and process visa applications</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4 mb-4">
               <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by name or application number..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8"
-                  />
-                </div>
+                <h3 className="font-semibold">Place your next Visa order</h3>
+                <p className="text-sm text-muted-foreground">We've got you covered for all countries</p>
+                <Button 
+                  className="mt-2" 
+                  size="sm"
+                  onClick={() => setShowAddItinerary(true)}
+                >
+                  New Order
+                </Button>
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="submitted">Submitted</SelectItem>
-                  <SelectItem value="in-review">In Review</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Applications Table */}
-            <div className="border rounded-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Applicant</TableHead>
-                    <TableHead>Application</TableHead>
-                    <TableHead>Type & Country</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredApplications.map((application) => (
-                    <TableRow key={application.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{application.applicantName}</p>
-                          <p className="text-sm text-muted-foreground">{application.applicantEmail}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-mono text-sm">{application.applicationNumber}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{application.type}</p>
-                          <p className="text-sm text-muted-foreground">{application.country}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant="outline" 
-                          className={priorityConfig[application.priority as keyof typeof priorityConfig].className}
-                        >
-                          {priorityConfig[application.priority as keyof typeof priorityConfig].label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={statusConfig[application.status as keyof typeof statusConfig].variant}
-                          className={statusConfig[application.status as keyof typeof statusConfig].className}
-                        >
-                          {statusConfig[application.status as keyof typeof statusConfig].label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(application.submittedDate).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={application.status}
-                          onValueChange={(value) => handleStatusChange(application.id, value)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="submitted">Submitted</SelectItem>
-                            <SelectItem value="in-review">In Review</SelectItem>
-                            <SelectItem value="approved">Approved</SelectItem>
-                            <SelectItem value="rejected">Rejected</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <FileText className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold">Documents & Pricing</h3>
+                <p className="text-sm text-muted-foreground">Visa details and prices for all countries</p>
+                <Button className="mt-2" size="sm" variant="outline">
+                  Check details
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Service Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                <Globe className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">USA Visa Appointment</h3>
+                <p className="text-sm text-muted-foreground">Early appointments starting at ₹15,362/-</p>
+                <Button className="mt-2 p-0" size="sm" variant="link">
+                  Apply Now →
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Activity className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">VFS at your Doorstep</h3>
+                <p className="text-sm text-muted-foreground">Exclusively for UK, Schengen</p>
+                <Button className="mt-2 p-0" size="sm" variant="link">
+                  Book Now →
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Package className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Konveyor – Travel APIs</h3>
+                <p className="text-sm text-muted-foreground">Reach out to our team for details about this product</p>
+                <Button className="mt-2 p-0" size="sm" variant="link">
+                  Apply Now →
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Services */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <Globe className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">StampMyVisa's Travel eSIM</h3>
+                <p className="text-sm text-muted-foreground">Flawless 5G network across the globe</p>
+                <Button className="mt-2 p-0" size="sm" variant="link">
+                  Buy eSIM →
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Shield className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">StampMyVisa Insure</h3>
+                <p className="text-sm text-muted-foreground">Travel Insurance starting at ₹12/day</p>
+                <Button className="mt-2 p-0" size="sm" variant="link">
+                  Buy Insurance →
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">0% Credit</h3>
+                <p className="text-sm text-muted-foreground">Zero Cost Credit Card payments with StampMyVisa</p>
+                <Button className="mt-2 p-0" size="sm" variant="link">
+                  Create Payout →
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Orders */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Your recent orders</CardTitle>
+            <Button variant="link" className="p-0">
+              View all orders →
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <OrdersTable />
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'orders':
+        return <OrdersTable />;
+      case 'add-itinerary':
+        return <AddItineraryForm />;
+      default:
+        return renderDashboardContent();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex w-full">
+      {/* Sidebar */}
+      <AdminSidebar collapsed={sidebarCollapsed} />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Header */}
+        <header className="bg-white border-b border-border px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              
+              {/* Navigation Tabs */}
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="bg-muted">
+                  <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                  <TabsTrigger value="orders">Orders</TabsTrigger>
+                  <TabsTrigger value="add-itinerary">Add Itinerary</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Dialog open={showAddItinerary} onOpenChange={setShowAddItinerary}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Order
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Add New Itinerary</DialogTitle>
+                  </DialogHeader>
+                  <AddItineraryForm onClose={() => setShowAddItinerary(false)} />
+                </DialogContent>
+              </Dialog>
+              
+              <Button variant="outline" onClick={logout}>
+                Logout
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-auto p-6">
+          {renderContent()}
+        </main>
       </div>
     </div>
   );
