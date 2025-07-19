@@ -34,14 +34,14 @@ class SMVKonveyorAPI {
       {
         countryId: 'uae',
         countryName: 'United Arab Emirates',
-        visaTypeId: 'uae-tourist',
+        visaTypeId: 'tourist',
         visaTypeName: 'Tourist Visa',
         lastUpdated: '2024-01-15',
         categories: [
           {
             id: 'mandatory',
             name: 'Mandatory docs',
-            icon: 'FileText',
+            icon: '📄',
             documents: [
               { id: 'passport', name: 'Valid Passport', required: true, description: 'Passport with at least 6 months validity' },
               { id: 'passport-copy', name: 'Passport front and back pages', required: true },
@@ -54,7 +54,7 @@ class SMVKonveyorAPI {
           {
             id: 'financial',
             name: 'Financial Documents',
-            icon: 'CreditCard',
+            icon: '💳',
             documents: [
               { id: 'bank-statement', name: 'Bank Statement (3 months)', required: true },
               { id: 'salary-certificate', name: 'Salary Certificate', required: false },
@@ -64,7 +64,7 @@ class SMVKonveyorAPI {
           {
             id: 'employed',
             name: 'For Employed',
-            icon: 'Briefcase',
+            icon: '💼',
             documents: [
               { id: 'employment-letter', name: 'Employment Letter', required: true },
               { id: 'noc', name: 'No Objection Certificate', required: true },
@@ -74,7 +74,7 @@ class SMVKonveyorAPI {
           {
             id: 'student',
             name: 'For Students',
-            icon: 'GraduationCap',
+            icon: '🎓',
             documents: [
               { id: 'student-id', name: 'Student ID Card', required: true },
               { id: 'enrollment-letter', name: 'College Enrollment Letter', required: true },
@@ -95,7 +95,7 @@ class SMVKonveyorAPI {
           {
             id: 'mandatory',
             name: 'Mandatory docs',
-            icon: 'FileText',
+            icon: '📄',
             documents: [
               { id: 'passport', name: 'Valid Passport', required: true },
               { id: 'form14a', name: 'Form 14A', required: true },
@@ -107,7 +107,7 @@ class SMVKonveyorAPI {
           {
             id: 'financial',
             name: 'Financial Proof',
-            icon: 'CreditCard',
+            icon: '💳',
             documents: [
               { id: 'bank-statement', name: 'Bank Statement (6 months)', required: true },
               { id: 'income-proof', name: 'Income Proof', required: true },
