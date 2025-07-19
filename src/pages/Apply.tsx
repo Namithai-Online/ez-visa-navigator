@@ -50,24 +50,32 @@ export default function Apply() {
 
   useEffect(() => {
     const loadData = async () => {
+      console.log('Apply page useEffect triggered');
       const visaId = searchParams.get('visa');
       const countryId = searchParams.get('country');
       
+      console.log('URL params:', { visaId, countryId });
+      
       if (visaId && countryId) {
         try {
+          console.log('Fetching data for visa:', visaId, 'country:', countryId);
           const [visaData, countryData, checklists] = await Promise.all([
             MockAPI.getVisaTypeById(visaId),
             MockAPI.getCountryById(countryId),
             SMVKonveyorAPI.getDocumentChecklist(countryId, visaId)
           ]);
+          console.log('Data fetched successfully:', { visaData, countryData, checklists });
           setVisaType(visaData);
           setCountry(countryData);
           setDocumentChecklist(checklists);
         } catch (error) {
           console.error('Error loading application data:', error);
         }
+      } else {
+        console.log('Missing required URL parameters');
       }
       setLoading(false);
+      console.log('Loading completed');
     };
 
     loadData();
