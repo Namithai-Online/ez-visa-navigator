@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { 
   Plane, 
@@ -8,31 +9,55 @@ import {
   Home, 
   Search, 
   FileText,
-  LogIn
+  LogIn,
+  LogOut,
+  Settings,
+  Shield
 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   
   const isActive = (path: string) => location.pathname === path;
   
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   const navItems = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/visa', label: 'Visas', icon: Search },
-    { href: '/dashboard', label: 'Dashboard', icon: FileText },
+    ...(user ? [{ href: user.role === 'admin' ? '/admin' : '/dashboard', label: 'Dashboard', icon: FileText }] : []),
   ];
+
+  // Don't show nav on login page
+  const showNav = location.pathname !== '/login';
 
   return (
     <div className="min-h-screen bg-background">
+      {showNav && (
+      <div>
       {/* Header */}
       <header className="bg-white shadow-soft border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -70,13 +95,71 @@ export default function Layout({ children }: LayoutProps) {
 
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
-                <User className="w-4 h-4 mr-2" />
-                Login
-              </Button>
-              <Button size="sm" className="bg-gradient-primary">
-                Apply Now
-              </Button>
+              {user ? (
+                <>
+                  <Link to="/apply">
+                    <Button size="sm" className="bg-gradient-primary">
+                      Apply Now
+                    </Button>
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>
+                            {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{user.name}</p>
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {user.role === 'admin' ? (
+                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin Panel</span>
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Dashboard</span>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="ghost" size="sm">
+                      <User className="w-4 h-4 mr-2" />
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/apply">
+                    <Button size="sm" className="bg-gradient-primary">
+                      Apply Now
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu */}
@@ -107,13 +190,45 @@ export default function Layout({ children }: LayoutProps) {
                   })}
                   
                   <div className="pt-4 border-t">
-                    <Button variant="ghost" className="w-full justify-start mb-2">
-                      <LogIn className="w-4 h-4 mr-3" />
-                      Login
-                    </Button>
-                    <Button className="w-full bg-gradient-primary">
-                      Apply Now
-                    </Button>
+                    {user ? (
+                      <>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start mb-2"
+                          onClick={() => navigate(user.role === 'admin' ? '/admin' : '/dashboard')}
+                        >
+                          <User className="w-4 h-4 mr-3" />
+                          {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start mb-2"
+                          onClick={handleLogout}
+                        >
+                          <LogOut className="w-4 h-4 mr-3" />
+                          Logout
+                        </Button>
+                        <Link to="/apply">
+                          <Button className="w-full bg-gradient-primary">
+                            Apply Now
+                          </Button>
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link to="/login">
+                          <Button variant="ghost" className="w-full justify-start mb-2">
+                            <LogIn className="w-4 h-4 mr-3" />
+                            Login
+                          </Button>
+                        </Link>
+                        <Link to="/apply">
+                          <Button className="w-full bg-gradient-primary">
+                            Apply Now
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
@@ -121,6 +236,8 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
+      </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1">

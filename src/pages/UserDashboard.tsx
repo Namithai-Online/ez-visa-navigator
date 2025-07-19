@@ -1,0 +1,232 @@
+import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { FileText, Clock, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+// Dummy application data
+const DUMMY_APPLICATIONS = [
+  {
+    id: '1',
+    type: 'Tourist Visa',
+    country: 'United States',
+    status: 'approved',
+    submittedDate: '2024-01-15',
+    updatedDate: '2024-01-20',
+    applicationNumber: 'US-TV-2024-001'
+  },
+  {
+    id: '2',
+    type: 'Business Visa',
+    country: 'Canada',
+    status: 'in-review',
+    submittedDate: '2024-01-10',
+    updatedDate: '2024-01-18',
+    applicationNumber: 'CA-BV-2024-002'
+  },
+  {
+    id: '3',
+    type: 'Student Visa',
+    country: 'United Kingdom',
+    status: 'draft',
+    submittedDate: null,
+    updatedDate: '2024-01-22',
+    applicationNumber: null
+  },
+  {
+    id: '4',
+    type: 'Work Visa',
+    country: 'Germany',
+    status: 'rejected',
+    submittedDate: '2024-01-05',
+    updatedDate: '2024-01-12',
+    applicationNumber: 'DE-WV-2024-003'
+  }
+];
+
+const statusConfig = {
+  approved: { 
+    label: 'Approved', 
+    variant: 'default' as const, 
+    icon: CheckCircle,
+    className: 'status-approved'
+  },
+  'in-review': { 
+    label: 'In Review', 
+    variant: 'secondary' as const, 
+    icon: Clock,
+    className: 'status-in-review'
+  },
+  draft: { 
+    label: 'Draft', 
+    variant: 'outline' as const, 
+    icon: FileText,
+    className: 'status-submitted'
+  },
+  rejected: { 
+    label: 'Rejected', 
+    variant: 'destructive' as const, 
+    icon: XCircle,
+    className: 'status-rejected'
+  }
+};
+
+export default function UserDashboard() {
+  const { user, logout } = useAuth();
+
+  const getStatusIcon = (status: string) => {
+    const IconComponent = statusConfig[status as keyof typeof statusConfig]?.icon || FileText;
+    return <IconComponent className="h-4 w-4" />;
+  };
+
+  const getStatusBadge = (status: string) => {
+    const config = statusConfig[status as keyof typeof statusConfig];
+    return (
+      <Badge variant={config?.variant || 'outline'} className={config?.className}>
+        {getStatusIcon(status)}
+        <span className="ml-1">{config?.label || status}</span>
+      </Badge>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto p-6">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.name}!</h1>
+            <p className="text-muted-foreground">Manage your visa applications</p>
+          </div>
+          <div className="flex gap-3">
+            <Link to="/apply">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Application
+              </Button>
+            </Link>
+            <Button variant="outline" onClick={logout}>
+              Logout
+            </Button>
+          </div>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-green-100 rounded-full">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Approved</p>
+                  <p className="text-2xl font-bold">1</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-orange-100 rounded-full">
+                  <Clock className="h-4 w-4 text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">In Review</p>
+                  <p className="text-2xl font-bold">1</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <FileText className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Drafts</p>
+                  <p className="text-2xl font-bold">1</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-red-100 rounded-full">
+                  <XCircle className="h-4 w-4 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Rejected</p>
+                  <p className="text-2xl font-bold">1</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Applications List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Applications</CardTitle>
+            <CardDescription>
+              Track the status of your visa applications
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {DUMMY_APPLICATIONS.map((application, index) => (
+                <div key={application.id}>
+                  <div className="flex items-center justify-between p-4 hover:bg-muted/50 rounded-lg transition-colors">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold">{application.type}</h3>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-muted-foreground">{application.country}</span>
+                        {getStatusBadge(application.status)}
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        {application.applicationNumber && (
+                          <span>App #: {application.applicationNumber}</span>
+                        )}
+                        {application.submittedDate && (
+                          <span>Submitted: {new Date(application.submittedDate).toLocaleDateString()}</span>
+                        )}
+                        <span>Updated: {new Date(application.updatedDate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      {application.status === 'draft' ? (
+                        <Link to={`/apply?edit=${application.id}`}>
+                          <Button variant="outline" size="sm">
+                            Continue
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Button variant="outline" size="sm">
+                          View Details
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {index < DUMMY_APPLICATIONS.length - 1 && <Separator />}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
