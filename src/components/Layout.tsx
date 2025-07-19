@@ -48,7 +48,7 @@ export default function Layout({ children }: LayoutProps) {
   const navItems = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/visa', label: 'Visas', icon: Search },
-    ...(user ? [{ href: user.role === 'admin' ? '/admin' : '/dashboard', label: 'Dashboard', icon: FileText }] : []),
+    ...(user ? [{ href: '/dashboard', label: 'Dashboard', icon: FileText }] : []),
   ];
 
   // Don't show nav on login page
@@ -122,17 +122,10 @@ export default function Layout({ children }: LayoutProps) {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      {user.role === 'admin' ? (
-                        <DropdownMenuItem onClick={() => navigate('/admin')}>
-                          <Shield className="mr-2 h-4 w-4" />
-                          <span>Admin Panel</span>
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Dashboard</span>
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>
@@ -195,10 +188,10 @@ export default function Layout({ children }: LayoutProps) {
                         <Button 
                           variant="ghost" 
                           className="w-full justify-start mb-2"
-                          onClick={() => navigate(user.role === 'admin' ? '/admin' : '/dashboard')}
+                          onClick={() => navigate('/dashboard')}
                         >
                           <User className="w-4 h-4 mr-3" />
-                          {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                          Dashboard
                         </Button>
                         <Button 
                           variant="ghost" 

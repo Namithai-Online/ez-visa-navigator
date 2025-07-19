@@ -12,7 +12,6 @@ import Apply from "./pages/Apply";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import UserDashboard from "./pages/UserDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
 import ApplicationDetails from "./pages/ApplicationDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -38,14 +37,6 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRole="user">
                     <UserDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/admin" 
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminDashboard />
                   </ProtectedRoute>
                 } 
               />

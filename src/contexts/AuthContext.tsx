@@ -4,7 +4,7 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: 'user' | 'admin';
+  role: 'user';
 }
 
 interface AuthContextType {
@@ -27,10 +27,10 @@ const DUMMY_USERS = [
   },
   {
     id: '2',
-    email: 'admin@demo.com',
-    password: 'admin123',
-    name: 'Admin User',
-    role: 'admin' as const
+    email: 'demo@test.com',
+    password: 'demo123',
+    name: 'Demo User',
+    role: 'user' as const
   }
 ];
 
