@@ -1,51 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { MockAPI } from '@/lib/api';
+import { Application, Country, VisaType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { FileText, Clock, CheckCircle, XCircle, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-// Dummy application data
-const DUMMY_APPLICATIONS = [
-  {
-    id: '1',
-    type: 'Tourist Visa',
-    country: 'United States',
-    status: 'approved',
-    submittedDate: '2024-01-15',
-    updatedDate: '2024-01-20',
-    applicationNumber: 'US-TV-2024-001'
-  },
-  {
-    id: '2',
-    type: 'Business Visa',
-    country: 'Canada',
-    status: 'in-review',
-    submittedDate: '2024-01-10',
-    updatedDate: '2024-01-18',
-    applicationNumber: 'CA-BV-2024-002'
-  },
-  {
-    id: '3',
-    type: 'Student Visa',
-    country: 'United Kingdom',
-    status: 'draft',
-    submittedDate: null,
-    updatedDate: '2024-01-22',
-    applicationNumber: null
-  },
-  {
-    id: '4',
-    type: 'Work Visa',
-    country: 'Germany',
-    status: 'rejected',
-    submittedDate: '2024-01-05',
-    updatedDate: '2024-01-12',
-    applicationNumber: 'DE-WV-2024-003'
-  }
-];
 
 const statusConfig = {
   approved: { 
@@ -60,11 +22,17 @@ const statusConfig = {
     icon: Clock,
     className: 'status-in-review'
   },
+  submitted: { 
+    label: 'Submitted', 
+    variant: 'secondary' as const, 
+    icon: Clock,
+    className: 'status-submitted'
+  },
   draft: { 
     label: 'Draft', 
     variant: 'outline' as const, 
     icon: FileText,
-    className: 'status-submitted'
+    className: 'status-draft'
   },
   rejected: { 
     label: 'Rejected', 
@@ -76,6 +44,51 @@ const statusConfig = {
 
 export default function UserDashboard() {
   const { user, logout } = useAuth();
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [visaTypes, setVisaTypes] = useState<VisaType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [appsData, countriesData, visaTypesData] = await Promise.all([
+          MockAPI.getUserApplications('user_001'), // Mock user ID
+          MockAPI.getCountries(),
+          MockAPI.getVisaTypes()
+        ]);
+        setApplications(appsData);
+        setCountries(countriesData);
+        setVisaTypes(visaTypesData);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const getCountryName = (countryId: string) => {
+    const country = countries.find(c => c.id === countryId);
+    return country?.name || countryId;
+  };
+
+  const getVisaTypeName = (visaTypeId: string) => {
+    const visaType = visaTypes.find(vt => vt.id === visaTypeId);
+    return visaType?.name || visaTypeId;
+  };
+
+  const getStatusCounts = () => {
+    const counts = {
+      approved: applications.filter(app => app.status === 'approved').length,
+      'in-review': applications.filter(app => app.status === 'in-review').length,
+      draft: applications.filter(app => app.status === 'draft').length,
+      rejected: applications.filter(app => app.status === 'rejected').length
+    };
+    return counts;
+  };
 
   const getStatusIcon = (status: string) => {
     const IconComponent = statusConfig[status as keyof typeof statusConfig]?.icon || FileText;
@@ -91,6 +104,20 @@ export default function UserDashboard() {
       </Badge>
     );
   };
+
+  const statusCounts = getStatusCounts();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="container mx-auto p-6">
+          <div className="text-center py-12">
+            <p>Loading your applications...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -124,7 +151,7 @@ export default function UserDashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Approved</p>
-                  <p className="text-2xl font-bold">1</p>
+                  <p className="text-2xl font-bold">{statusCounts.approved}</p>
                 </div>
               </div>
             </CardContent>
@@ -138,7 +165,7 @@ export default function UserDashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">In Review</p>
-                  <p className="text-2xl font-bold">1</p>
+                  <p className="text-2xl font-bold">{statusCounts['in-review']}</p>
                 </div>
               </div>
             </CardContent>
@@ -152,7 +179,7 @@ export default function UserDashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Drafts</p>
-                  <p className="text-2xl font-bold">1</p>
+                  <p className="text-2xl font-bold">{statusCounts.draft}</p>
                 </div>
               </div>
             </CardContent>
@@ -166,7 +193,7 @@ export default function UserDashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Rejected</p>
-                  <p className="text-2xl font-bold">1</p>
+                  <p className="text-2xl font-bold">{statusCounts.rejected}</p>
                 </div>
               </div>
             </CardContent>
@@ -183,48 +210,58 @@ export default function UserDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {DUMMY_APPLICATIONS.map((application, index) => (
-                <div key={application.id}>
-                  <div className="flex items-center justify-between p-4 hover:bg-muted/50 rounded-lg transition-colors">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold">{application.type}</h3>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-muted-foreground">{application.country}</span>
-                        {getStatusBadge(application.status)}
+              {applications.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">No applications found</p>
+                  <Link to="/apply">
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Start Your First Application
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                applications.map((application, index) => (
+                  <div key={application.id}>
+                    <div className="flex items-center justify-between p-4 hover:bg-muted/50 rounded-lg transition-colors">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold">{getVisaTypeName(application.visaTypeId)}</h3>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">{getCountryName(application.countryId)}</span>
+                          {getStatusBadge(application.status)}
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>App #: {application.id}</span>
+                          {application.submittedAt && (
+                            <span>Submitted: {new Date(application.submittedAt).toLocaleDateString()}</span>
+                          )}
+                          <span>Updated: {new Date(application.updatedAt).toLocaleDateString()}</span>
+                        </div>
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        {application.applicationNumber && (
-                          <span>App #: {application.applicationNumber}</span>
+                      <div className="flex gap-2">
+                        {application.status === 'draft' ? (
+                          <Link to={`/apply?edit=${application.id}`}>
+                            <Button variant="outline" size="sm">
+                              Continue
+                            </Button>
+                          </Link>
+                        ) : (
+                          <Link to={`/application/${application.id}`}>
+                            <Button variant="outline" size="sm">
+                              View Details
+                            </Button>
+                          </Link>
                         )}
-                        {application.submittedDate && (
-                          <span>Submitted: {new Date(application.submittedDate).toLocaleDateString()}</span>
-                        )}
-                        <span>Updated: {new Date(application.updatedDate).toLocaleDateString()}</span>
                       </div>
                     </div>
                     
-                    <div className="flex gap-2">
-                      {application.status === 'draft' ? (
-                        <Link to={`/apply?edit=${application.id}`}>
-                          <Button variant="outline" size="sm">
-                            Continue
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Link to={`/application/${application.id}`}>
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
+                    {index < applications.length - 1 && <Separator />}
                   </div>
-                  
-                  {index < DUMMY_APPLICATIONS.length - 1 && <Separator />}
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
